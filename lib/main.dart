@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double weight = 0.0;
   double height = 0.0;
   double bmi = 0.0;
+  List<double> bmiHistory = [];
 
   @override
   Widget build(BuildContext context) {
@@ -41,52 +42,99 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
-      ),
-        body: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(16.0),
-          ),
-          margin: const EdgeInsets.all(16.0),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-          TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Weight (kg)',
-            ),
-            onChanged: (value) {
-              weight = double.tryParse(value) ?? 0.0;
-            },
-          ),
-          const SizedBox(height: 16.0),
-          TextField(
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Height (cm)',
-            ),
-            onChanged: (value) {
-              height = double.tryParse(value) ?? 0.0;
-            },
-          ),
-          const SizedBox(height: 16.0),
-          ElevatedButton(
+        actions: [
+          IconButton(
             onPressed: () {
-              setState(() {
-                bmi = weight / ((height / 100) * (height / 100));
-              });
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return _historyList();
+                },
+              );
             },
-            child: const Text('Calculate BMI'),
+            icon: const Icon(Icons.history),
           ),
-          const SizedBox(height: 16.0),
-          Text('Your BMI is $bmi'),
-              ],
-            ),
+        ],
+      ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: <Widget>[
+              Container(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  'BMI Calculator',
+                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                ),
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Weight (kg)',
+                      ),
+                      onChanged: (value) {
+                        weight = double.tryParse(value) ?? 0.0;
+                      },
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextField(
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Height (cm)',
+                      ),
+                      onChanged: (value) {
+                        height = double.tryParse(value) ?? 0.0;
+                      },
+                    ),
+                    const SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          bmi = weight / ((height / 100) * (height / 100));
+                        });
+                      },
+                      child: const Text('Calculate BMI'),
+                    ),
+                    const SizedBox(height: 16.0),
+                    Text('Your BMI is $bmi'),
+                  ],
+                ),
+              )
+            ],
           ),
       ),
+    );
+  }
+
+  Widget _historyList() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          Text(
+            'BMI History',
+            style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16.0),
+          ListView.builder(
+            itemCount: bmiHistory.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text('BMI: ${bmiHistory[index]}'),
+              );
+            },
+          ),
+        ],
+      ), 
     );
   }
 }
