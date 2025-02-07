@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dynamic_color/dynamic_color.dart';
+import 'package:dynamic_color/dynamic_color.dart'; //Importing the dynamic_color package for color scheme
+import 'package:intl/intl.dart'; //Importing the intl package for date formatting
 
 void main() {
   runApp(const MyApp());
@@ -34,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   double weight = 0.0;
   double height = 0.0;
   double bmi = 0.0;
-  List<double> bmiHistory = [];
+  List<Map<String, dynamic>> bmiHistory = [];
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +101,11 @@ class _MyHomePageState extends State<MyHomePage> {
                       onPressed: () {
                         setState(() {
                           bmi = weight / ((height / 100) * (height / 100));
+                          bmi = double.parse(bmi.toStringAsFixed(2));
+                          bmiHistory.add({
+                            'date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                            'bmi': bmi,
+                          });
                         });
                       },
                       child: const Text('Calculate BMI'),
@@ -116,25 +122,32 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _historyList() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          Text(
-            'BMI History',
-            style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16.0),
-          ListView.builder(
-            itemCount: bmiHistory.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                title: Text('BMI: ${bmiHistory[index]}'),
-              );
-            },
-          ),
-        ],
-      ), 
+    return SizedBox(
+      height: 300.0,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'BMI History',
+              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16.0),
+            ListView.builder(
+              shrinkWrap: true, //This is important to avoid the error of infinite height
+              physics: const NeverScrollableScrollPhysics(), //This is important to avoid the error of infinite height 
+              itemCount: bmiHistory.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text('Date: ${bmiHistory[index]['date']}'),
+                  subtitle: Text('BMI: ${bmiHistory[index]['bmi']}'),
+                );
+              },
+            ),
+          ],
+        )
+      )
     );
   }
 }
