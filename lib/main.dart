@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 //Importing the dynamic_color package for color scheme
+import 'package:dynamic_color/dynamic_color.dart';
 import 'package:intl/intl.dart'; //Importing the intl package for date formatting
 
 void main() {
@@ -11,13 +12,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BMI Calculator',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'BMI Calculator'),
+
+    return DynamicColorBuilder(
+      builder: (lightDynamic, darkDynamic) {
+        final ColorScheme lightColorScheme = lightDynamic?.harmonized()
+          ?? ColorScheme.fromSeed(seedColor: Colors.blue);
+        final ColorScheme darkColorScheme = darkDynamic?.harmonized()
+          ?? ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark);
+        return MaterialApp(
+          title: 'BMI Calculator',
+          theme: ThemeData(
+            colorScheme: lightColorScheme,
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: darkColorScheme,
+            useMaterial3: true,
+          ),
+          themeMode: ThemeMode.system,
+          home: const MyHomePage(title: 'BMI Calculator'),
+        );
+      },
     );
   }
 }
@@ -68,15 +83,18 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: <Widget>[
-              Container(
+                Container(
                 alignment: Alignment.topLeft,
                 child: Text(
-                  'BMI Calculator',
-                  style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+                  bmiHistory.isNotEmpty
+                    ? 'Your latest BMI: ${bmiHistory.last['bmi']}'
+                    : 'No BMI data available',
+                  style: TextStyle(fontSize: 60.0, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -108,6 +126,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   subtitle: Text('BMI: ${bmiHistory[index]['bmi']}'),
                 );
               },
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Title(color: Colors.black, 
+                child: Text("Testing Container"))
             ),
           ],
         )
