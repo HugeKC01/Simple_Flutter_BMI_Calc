@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dynamic_color/dynamic_color.dart'; //Importing the dynamic_color package for color scheme
+//Importing the dynamic_color package for color scheme
 import 'package:intl/intl.dart'; //Importing the intl package for date formatting
 
 void main() {
@@ -55,6 +55,17 @@ class _MyHomePageState extends State<MyHomePage> {
             },
             icon: const Icon(Icons.history),
           ),
+          IconButton(
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return _addBMIDialog(context);
+                },
+              );
+            },
+            icon: const Icon(Icons.add),
+          ),
         ],
       ),
         body: Padding(
@@ -68,53 +79,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
                 ),
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Weight (kg)',
-                      ),
-                      onChanged: (value) {
-                        weight = double.tryParse(value) ?? 0.0;
-                      },
-                    ),
-                    const SizedBox(height: 16.0),
-                    TextField(
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Height (cm)',
-                      ),
-                      onChanged: (value) {
-                        height = double.tryParse(value) ?? 0.0;
-                      },
-                    ),
-                    const SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          bmi = weight / ((height / 100) * (height / 100));
-                          bmi = double.parse(bmi.toStringAsFixed(2));
-                          bmiHistory.add({
-                            'date': DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                            'bmi': bmi,
-                          });
-                        });
-                      },
-                      child: const Text('Calculate BMI'),
-                    ),
-                    const SizedBox(height: 16.0),
-                    Text('Your BMI is $bmi'),
-                  ],
-                ),
-              )
             ],
           ),
       ),
@@ -148,6 +112,59 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         )
       )
+    );
+  }
+
+  Widget _addBMIDialog(BuildContext context) {
+  return AlertDialog(
+    title: const Text('Add BMI'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          TextField(
+            decoration: const InputDecoration(
+              border: OutlineInputBorder(),
+              labelText: 'Weight (kg)',
+            ),
+            onChanged: (value) {
+              weight = double.tryParse(value) ?? 0.0;
+            },
+          ),
+          const SizedBox(height: 16.0),
+          TextField(
+            decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+              labelText: 'Height (cm)',
+            ),
+            onChanged: (value) {
+              height = double.tryParse(value) ?? 0.0;
+            },
+         ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+           Navigator.of(context).pop();
+          },
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            setState(() {
+              bmi = weight / ((height / 100) * (height / 100));
+              bmiHistory.add(
+                {
+                  'date': DateFormat.yMd().format(DateTime.now()),
+                  'bmi': bmi.toStringAsFixed(2),
+                }
+              );
+            });
+          },
+          child: const Text('Add'),
+        ),
+      ],
     );
   }
 }
